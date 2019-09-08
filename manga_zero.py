@@ -38,6 +38,12 @@ def login():
 
 def getManga():
     b.get(TARGET_URL)
+    sleep(1)
+    b.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    b.find_elements_by_class_name('item-episode-title.isRead')[0].click()
+    #print(target_episode)
+    #target_episode[0].click()
+    #b.find_element_by_class_name('button-content')
     
 
 b = webdriver.Chrome('./chromedriver')
