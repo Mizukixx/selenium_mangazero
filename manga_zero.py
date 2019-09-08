@@ -16,8 +16,8 @@ from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
-LOGIN_ID = 'kozasamizuki@gmail.com'
-LOGIN_PASSWORD = 'nekoneko55'
+LOGIN_ID = '********'
+LOGIN_PASSWORD = '********'
 LOGIN_URL = 'https://manga-zero.com/login'
 TARGET_URL = 'https://manga-zero.com/product/3769'
 
