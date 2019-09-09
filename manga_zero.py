@@ -24,6 +24,8 @@ LOGIN_PASSWORD = 'nekoneko55'
 LOGIN_URL = 'https://manga-zero.com/login'
 TARGET_URL = 'https://manga-zero.com/product/3769'
 
+cnt = 0
+
 def login():
     b.get(LOGIN_URL)
     b.find_element_by_class_name('register-facebook').click()
@@ -41,16 +43,16 @@ def login():
 
 def getFree():
     b.get(TARGET_URL)
-    sleep(1)
+    sleep(5)
     b.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     numBlueTicket = len(b.find_elements_by_class_name('chip-icon.chip-icon--blue'))
     for a in range(numBlueTicket):
         b.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         b.find_elements_by_class_name('chip-icon.chip-icon--blue')[a].click()
         print('Now loading episode ---- '+ str(a+1))
-        sleep(3)
+        sleep(5)
         b.find_element_by_class_name('button-direction.button-direction__horizontal').click()
-        sleep(3)
+        sleep(5)
 
         images = b.find_elements_by_class_name('canvas-wrapper')
         for c in range(len(images)):
@@ -59,41 +61,56 @@ def getFree():
             with open('./image/'+ file_name, 'wb') as f:
                 f.write(png)
             b.find_element_by_class_name('arrow.arrow-left').click()
-            sleep(2)
+            sleep(5)
 
         b.find_element_by_class_name('button--white.button--radius-4.button--40').click()
-        sleep(1)
-        b.find_elements_by_class_name('button-close')[1].click()
         sleep(3)
+        b.find_elements_by_class_name('button-close')[1].click()
+        sleep(5)
+
+    cnt = numBlueTicket
 
 def getManga():
     b.get(TARGET_URL)
-    sleep(1)
+    sleep(4)
     b.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    b.find_elements_by_class_name('chip-icon.chip-icon--blue')[0].click()
-    #sleep(2)
-    #b.find_element_by_class_name('button-content').click()
-    sleep(3)
-    b.find_element_by_class_name('button-direction.button-direction__horizontal').click()
-    #画像保存
-    sleep(3)
-    images = b.find_elements_by_class_name('canvas-wrapper')
-    for a in range(len(images)):
-        png = b.find_element_by_class_name('viewer-horizontal').screenshot_as_png
-        file_name = str(a)+'.png'
-        with open('./image/'+ file_name, 'wb') as f:
-            f.write(png)
-        b.find_element_by_class_name('arrow.arrow-left').click()
-        sleep(2)
+    numGreenTicket = len(b.find_elements_by_class_name('chip-icon.chip-icon--green'))
+
+    if numGreenTicket > 4:
+        numGreenTicket = 4
+
+    for x in range(numGreenTicket):
+        b.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        print(b.find_elements_by_class_name('chip-icon.chip-icon--green'))
+        b.find_elements_by_class_name('chip-icon.chip-icon--green')[0].click()
+        print('cnt is ---' + str(cnt))
+        print('Now loading episode ---- '+ str(cnt+x+1))
+        sleep(4) 
+        b.find_element_by_class_name('button-content').click()
+        sleep(5)
+        b.find_element_by_class_name('button-direction.button-direction__horizontal').click()
+        sleep(5)
+        images = b.find_elements_by_class_name('canvas-wrapper')
+        for y in range(len(images)):
+            png = b.find_element_by_class_name('viewer-horizontal').screenshot_as_png
+            file_name = str(cnt+x+1) + '_' + str(y+1)+'.png'
+            with open('./image/'+ file_name, 'wb') as f:
+                f.write(png)
+            b.find_element_by_class_name('arrow.arrow-left').click()
+            sleep(4)
 
     b.find_element_by_class_name('button--white.button--radius-4.button--40').click()
-    
+    sleep(4)
+    b.find_elements_by_class_name('button-close')[1].click()
+    sleep(4)
     
 b = webdriver.Chrome('./chromedriver')
 
 login()
 sleep(2)
-getFree()
-#getManga()
+#getFree()
+#cnt=2
+#print(cnt)
+getManga()
 #b.close()
 
