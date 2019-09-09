@@ -15,6 +15,9 @@ import requests
 from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.action_chains import ActionChains
+
 
 LOGIN_ID = '********'
 LOGIN_PASSWORD = '********'
@@ -32,68 +35,65 @@ def login():
     except:
         print("Login directly!!")
     try:
-        b.find_element_by_class_name('button--white button--radius-4 button--40').click()
+        b.find_element_by_class_name('button--white.button--radius-4.button--40').click()
     except:
-        print('No more tickets you can get')
+        print('No more getable tickets')
+
+def getFree():
+    b.get(TARGET_URL)
+    sleep(1)
+    b.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    numBlueTicket = len(b.find_elements_by_class_name('chip-icon.chip-icon--blue'))
+    for a in range(numBlueTicket):
+        b.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        b.find_elements_by_class_name('chip-icon.chip-icon--blue')[a].click()
+        print('Now loading episode ---- '+ str(a+1))
+        sleep(3)
+        b.find_element_by_class_name('button-direction.button-direction__horizontal').click()
+        sleep(3)
+
+        images = b.find_elements_by_class_name('canvas-wrapper')
+        for c in range(len(images)):
+            png = b.find_element_by_class_name('viewer-horizontal').screenshot_as_png
+            file_name = str(a+1)+'_'+ str(c+1)+'.png'
+            with open('./image/'+ file_name, 'wb') as f:
+                f.write(png)
+            b.find_element_by_class_name('arrow.arrow-left').click()
+            sleep(2)
+
+        b.find_element_by_class_name('button--white.button--radius-4.button--40').click()
+        sleep(1)
+        b.find_elements_by_class_name('button-close')[1].click()
+        sleep(3)
 
 def getManga():
     b.get(TARGET_URL)
     sleep(1)
     b.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    b.find_elements_by_class_name('item-episode-title.isRead')[0].click()
-    #print(target_episode)
-    #target_episode[0].click()
-    #b.find_element_by_class_name('button-content')
-    
+    b.find_elements_by_class_name('chip-icon.chip-icon--blue')[0].click()
+    #sleep(2)
+    #b.find_element_by_class_name('button-content').click()
+    sleep(3)
+    b.find_element_by_class_name('button-direction.button-direction__horizontal').click()
+    #画像保存
+    sleep(3)
+    images = b.find_elements_by_class_name('canvas-wrapper')
+    for a in range(len(images)):
+        png = b.find_element_by_class_name('viewer-horizontal').screenshot_as_png
+        file_name = str(a)+'.png'
+        with open('./image/'+ file_name, 'wb') as f:
+            f.write(png)
+        b.find_element_by_class_name('arrow.arrow-left').click()
+        sleep(2)
 
+    b.find_element_by_class_name('button--white.button--radius-4.button--40').click()
+    
+    
 b = webdriver.Chrome('./chromedriver')
 
 login()
 sleep(2)
-getManga()
+getFree()
+#getManga()
 #b.close()
 
-#one-click注文オン
-#b.find_element_by_class_name('a-size-mini').click()
-#while True:
-#	# 値段
-#	p = b.find_element_by_id('priceblock_ourprice').text
-#	print(str(p))
-#	p = int(str(p).replace('￥','').replace(',',''))
-#	#ショップ
-#	shop = b.find_element_by_id('merchant-info').text
-#	shop = shop.split('この商品は、')[1].split(' が販売、発送します。')[0]
-#	shop = shop.replace('が販売し、Amazon.co.jp が発送します。','').replace('この出品商品にはコンビニ・ATM・ネットバンキング・電子マネー払いが利用できます。','').replace(' ギフトラッピングを利用できます。','')
-#	#商品名
-#	title = b.find_element_by_id('title').text
-#	print('========================================')
-#	print(PURPLE+'¥'+str(p)+ ENDC+' '+shop+ ' ' +UNDERLINE+OKBLUE+title+ENDC)
-#	print('========================================')
-	#値段が希望額以下であり，かつ，ショップがAmazonである時のみ購入
-#	if p <=lim and shop == 'Amazon.co.jp':
-#		break
-#	else:
-#		b.refresh()
-#	time.sleep(random.uniform(4, 7))
-#	time.sleep(0.3)
-#	print('*****')
-#	time.sleep(0.3)
-#	print('****')
-#	time.sleep(0.3)
-#	print('***')
-#	time.sleep(0.3)
-#	print('**')
-#	time.sleep(0.3)
-#	print('*')
-#
-#b.find_element_by_id('one-click-button').click()
-#b.find_element_by_id('buy-now-button').click()
-#time.sleep(1)
-#b.find_element_by_name('ppw-widgetEvent:SetPaymentPlanSelectContinueEvent').click()
-#time.sleep(2)
-#placeYourOrder1
-#b.find_element_by_xpath("//input[@title='注文を確定する']").click();
-#b.find_element_by_class_name('a-button-text.place-your-order-button').click()
-#print('商品を購入しました')
-#LINE_notify(ITEM_URL)
-#print(OKGREEN+'LINEにお知らせしました'+ENDC)
