@@ -1,4 +1,4 @@
-#coding: utf-8
+#oding: utf-8
 PURPLE  = '\033[35m'
 RED     = '\033[31m'
 CYAN    = '\033[36m'
@@ -17,7 +17,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
-
+import os
 
 LOGIN_ID = 'kozasamizuki@gmail.com'
 LOGIN_PASSWORD = 'nekoneko55'
@@ -26,91 +26,120 @@ TARGET_URL = 'https://manga-zero.com/product/3769'
 
 cnt = 0
 
+
+
 def login():
     b.get(LOGIN_URL)
     b.find_element_by_class_name('register-facebook').click()
     sleep(2)
+    
     try:
         b.find_element_by_id('email').send_keys(LOGIN_ID)
-        b.find_element_by_id('pass').send_keys(LOGIN_PASSWORD)
+        b.find_eleent_by_id('pass').send_keys(LOGIN_PASSWORD)
         b.find_element_by_id('loginbutton').click()
+    #in case of pass login without authentication
     except:
         print("Login directly!!")
+    
+    #for first login by 12 hours'
     try:
         b.find_element_by_class_name('button--white.button--radius-4.button--40').click()
     except:
         print('No more getable tickets')
 
+
 def getFree():
     b.get(TARGET_URL)
-    sleep(5)
+    sleep(2) 
     b.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     numBlueTicket = len(b.find_elements_by_class_name('chip-icon.chip-icon--blue'))
+
+    #save manga for FREE
     for a in range(numBlueTicket):
+        #open episode
         b.execute_script("window.scrollTo(0, document.body.scrollHeight);")
         b.find_elements_by_class_name('chip-icon.chip-icon--blue')[a].click()
         print('Now loading episode ---- '+ str(a+1))
-        sleep(5)
+        sleep(2)
         b.find_element_by_class_name('button-direction.button-direction__horizontal').click()
-        sleep(5)
-
+        sleep(3)
+        
+        #get length of images to save(for counting roop)
         images = b.find_elements_by_class_name('canvas-wrapper')
+        
+        #save images
         for c in range(len(images)):
             png = b.find_element_by_class_name('viewer-horizontal').screenshot_as_png
             file_name = str(a+1)+'_'+ str(c+1)+'.png'
             with open('./image/'+ file_name, 'wb') as f:
                 f.write(png)
             b.find_element_by_class_name('arrow.arrow-left').click()
-            sleep(5)
+            sleep(3)
 
+        #close episode
         b.find_element_by_class_name('button--white.button--radius-4.button--40').click()
-        sleep(3)
+        sleep(2)
         b.find_elements_by_class_name('button-close')[1].click()
-        sleep(5)
+        sleep(4)
 
     cnt = numBlueTicket
+    return cnt
 
-def getManga():
+
+def getManga():    
     b.get(TARGET_URL)
-    sleep(4)
+    sleep(3)
     b.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     numGreenTicket = len(b.find_elements_by_class_name('chip-icon.chip-icon--green'))
 
     if numGreenTicket > 4:
         numGreenTicket = 4
-
+    
+    #save manga using green tickets
     for x in range(numGreenTicket):
+        #open episode
         b.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        
         print(b.find_elements_by_class_name('chip-icon.chip-icon--green'))
-        b.find_elements_by_class_name('chip-icon.chip-icon--green')[0].click()
-        print('cnt is ---' + str(cnt))
+        try:
+            b.find_elements_by_class_name('chip-icon.chip-icon--green')[0].click()
+        except:
+            #in case of available green ticket left only one
+            b.find_element_by_class_name('chip-icon.chip-icon--green').click()
+        
         print('Now loading episode ---- '+ str(cnt+x+1))
-        sleep(4) 
+        sleep(3) 
         b.find_element_by_class_name('button-content').click()
-        sleep(5)
+        sleep(3)
         b.find_element_by_class_name('button-direction.button-direction__horizontal').click()
-        sleep(5)
+        sleep(3)
+
+        #get length of images to save(for counting roop)
         images = b.find_elements_by_class_name('canvas-wrapper')
+        
+        #save images
         for y in range(len(images)):
             png = b.find_element_by_class_name('viewer-horizontal').screenshot_as_png
             file_name = str(cnt+x+1) + '_' + str(y+1)+'.png'
             with open('./image/'+ file_name, 'wb') as f:
                 f.write(png)
             b.find_element_by_class_name('arrow.arrow-left').click()
-            sleep(4)
+            sleep(3)
 
+    #close episode
+    sleep(3)
     b.find_element_by_class_name('button--white.button--radius-4.button--40').click()
-    sleep(4)
+    sleep(2)
     b.find_elements_by_class_name('button-close')[1].click()
     sleep(4)
+
     
+
 b = webdriver.Chrome('./chromedriver')
 
 login()
 sleep(2)
-#getFree()
-#cnt=2
-#print(cnt)
+getFree()
 getManga()
 #b.close()
 
