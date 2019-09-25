@@ -17,7 +17,6 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
-import os
 
 LOGIN_ID = 'kozasamizuki@gmail.com'
 LOGIN_PASSWORD = 'nekoneko55'
@@ -26,8 +25,6 @@ TARGET_URL = 'https://manga-zero.com/product/3769'
 
 cnt = 0
 
-
-
 def login():
     b.get(LOGIN_URL)
     b.find_element_by_class_name('register-facebook').click()
@@ -35,7 +32,7 @@ def login():
     
     try:
         b.find_element_by_id('email').send_keys(LOGIN_ID)
-        b.find_eleent_by_id('pass').send_keys(LOGIN_PASSWORD)
+        b.find_element_by_id('pass').send_keys(LOGIN_PASSWORD)
         b.find_element_by_id('loginbutton').click()
     #in case of pass login without authentication
     except:
@@ -99,13 +96,24 @@ def getManga():
     for x in range(numGreenTicket):
         #open episode
         b.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        
-        print(b.find_elements_by_class_name('chip-icon.chip-icon--green'))
+
         try:
-            b.find_elements_by_class_name('chip-icon.chip-icon--green')[0].click()
+            b.find_elements_by_class_name('chip-icon.chip-icon--green')
+            try:
+                #available green ticket exists at first page
+                b.find_elements_by_class_name('chip-icon.chip-icon--green')[0].click()
+            except:
+                #in case of available green ticket left only one
+                b.find_element_by_class_name('chip-icon.chip-icon--green').click()
         except:
-            #in case of available green ticket left only one
-            b.find_element_by_class_name('chip-icon.chip-icon--green').click()
+            try:
+                #available green ticket doesn't exist at first page but next
+                b.find_element_by_class_name('next.item-pagination').click()
+                sleep(3)
+                b.find_elements_by_class_name('chip-icon.chip-icon--green')[0].click()
+            except:
+                #available green ticket doesn't exist at all
+                print('manga completedly saved!')
         
         print('Now loading episode ---- '+ str(cnt+x+1))
         sleep(3) 
@@ -133,13 +141,36 @@ def getManga():
     b.find_elements_by_class_name('button-close')[1].click()
     sleep(4)
 
-    
 
-b = webdriver.Chrome('./chromedriver')
 
-login()
-sleep(2)
-getFree()
-getManga()
+def readLogFile():
+    a = open('log.csv','r+')
+    manga_list = []
+    for row in a:
+        LINE = row.rstrip().split(',')
+        ID = LINE[0]
+        title = LINE[1]
+        manga_list.append(title)
+    return manga_list
+        
+
+def hosii():
+    z = open('hosii.txt','r')
+    hosii_list=[]
+    for row in z:
+        manga = row.rstrip()
+        hosii_list.append(manga)
+    return hosii_list
+
+
+#b = webdriver.Chrome('./chromedriver')
+#login()
+#sleep(2)
+hosii_list = hosii()
+log_list = readLogFile()
+print(hosii_list)
+print(log_list)
+#getFree()
+#getManga()
 #b.close()
 
